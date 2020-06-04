@@ -1,6 +1,4 @@
 <#
-.Synopsis
-   LW - ORC Endpoint Development
 .DESCRIPTION
    Downloads a Chocolatey community package and pushes to an internal repository server.
 .EXAMPLE
@@ -28,7 +26,7 @@ Function Internalise-ChocolateyPackage
         [string]$CommunityPackage,
 
         #Chocolatey Server Name
-        $ChocolateyServerURL = "https://chocolatey.derby.ac.uk/chocolatey",
+        $ChocolateyServerURL = "",
 
         #Optionally specify a download directory
         $DownloadDirectory,
