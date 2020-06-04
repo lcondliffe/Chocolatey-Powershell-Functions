@@ -2,7 +2,7 @@
 #Chocolatey Automated Package Internalisation Process
 
 ##Variable Declaration##
-$UOD_repo = "https://chocolatey.derby.ac.uk/chocolatey"
+$repo = ""
 $Community_repo = "https://chocolatey.org/api/v2/"
 $chocolatey_api_key = "APIKEYHERE"
 $download_dir = "C:\TEMP\"
@@ -250,7 +250,7 @@ Invoke-RestMethod -uri $uri -Method Post -body $body -ContentType 'application/j
 ##BEGIN##
 
 #Get a list of all packages available on the internal repository.
-$package_list = choco search --source=$UOD_repo --limitoutput
+$package_list = choco search --source=$repo --limitoutput
 #Strip version details from each object, use array list object type to allow easier removing of items from the list for exclusions:
 [System.Collections.ArrayList]$package_list = $package_list | % {$_.Substring(0, $_.lastIndexOf('|'))}
 
@@ -261,7 +261,7 @@ foreach ($package in $package_list) {
     
     #Compare versions on local and remote repositories
     Write-Log "Checking for new versions of $package"
-    $choco_local_verison = choco search $package --source=$UOD_repo -exact -limitoutput
+    $choco_local_verison = choco search $package --source=$repo -exact -limitoutput
     $choco_community_version = choco search $package --source=$Community_repo -exact -limitoutput
 
     if ($choco_community_version -eq $null){
@@ -273,7 +273,7 @@ foreach ($package in $package_list) {
             Write-Log "$package version outdated. $choco_local_verison is on-premise, $choco_community_version is available on the community repository. An attempt will be made to internalise this new version." -Level WARN
 
             #Call internalisation function:
-            Internalise-ChocolateyPackage -CommunityPackage $package -ChocolateyServerURL $UOD_repo -DownloadDirectory $download_dir -uod_api $chocolatey_api_key -Verbose
+            Internalise-ChocolateyPackage -CommunityPackage $package -ChocolateyServerURL $repo -DownloadDirectory $download_dir -uod_api $chocolatey_api_key -Verbose
             $updated_packages += " $package,"
         }
         else{
@@ -283,6 +283,6 @@ foreach ($package in $package_list) {
 }
 #If any new package versions have been internalised, notify.
 if($updated_packages -ne $null){
-    Write-Log "$updated_packages has been automatically internalised to $UOD_repo."
-    Send-TeamsMessage -message "$updated_packages has been automatically internalised to $UOD_repo." -Success
+    Write-Log "$updated_packages has been automatically internalised to $repo."
+    Send-TeamsMessage -message "$updated_packages has been automatically internalised to $repo." -Success
 }
